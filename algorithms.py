@@ -422,19 +422,13 @@ class NBS:
         print("back ready len: " + str(len(self.backReadyList)))
         print("updated node: "+ str(self.updatednode))
 
-    def generatePath(self, node, frontOrBack):
+    def generatePath(self, node):
         newNode = node
         newNode.print()
-        if frontOrBack == 0:
-            hashTa = self.hashFrontTa
-            array = self.frontArrayInfo
-        else:
-            hashTa = self.hashBackTa
-            array = self.backArrayInfo
 
         while ut.isNotNum(newNode.prestate):
-            nodeIndex = hashTa[tuple(newNode.prestate)]
-            newNode = array[nodeIndex]
+            nodeIndex = self.hashFrontTa[tuple(newNode.prestate)]
+            newNode = self.frontArrayInfo[nodeIndex]
             newNode.print()
 
     def search(self, start, goal):
@@ -516,9 +510,11 @@ class NBS:
                     # add to openlist
 
             # should not heapfiy here
-            if backOpenlistchange or FrontOpenlistchange:
+            if backOpenlistchange:
                 heapq.heapify(self.backWaitList)
                 heapq.heapify(self.backReadyList)
+
+            if FrontOpenlistchange:
                 heapq.heapify(self.frontWaitList)
                 heapq.heapify(self.frontReadyList)
 
@@ -575,29 +571,28 @@ class NBS:
             ###########termination and add to close#####################
             frontExpand = self.frontArrayInfo[frontExpandIndex]
             backExpand = self.backArrayInfo[backExpandIndex]
+
             frontExInBack = ut.inHashTable(self.hashBackTa, tuple(frontExpand.state))
-            if frontExInBack[0] :
+            backExInFront = ut.inHashTable(self.hashFrontTa, tuple(backExpand.state))
+
+            if frontExInBack[0]:
                 endtime = time.time()
                 print("finish time is " + str(endtime - starttime))
-                # decide whether the found front node in back is in open or close, in order to decide the found gcost.
                 indexFrontInBack = frontExInBack[1]
-                inOpen = False
-                for j in self.backWaitList:
-                    if indexFrontInBack == j.index:
-                        inOpen = True
-                for j in self.backReadyList:
-                    if indexFrontInBack == j.index:
-                        inOpen = True
                 realG_cost = self.backArrayInfo[indexFrontInBack].gcost+frontExpand.gcost
-                if inOpen:
-                    print("find gcost is: "+str(realG_cost+1))
-                else:
-                    print("find gcost is: "+str(realG_cost))
-                # end of decide the gcost.
+                print("find gcost is: "+str(realG_cost))
                 self.showlists()
-                self.generatePath(frontExpand, 0)
-                print("###################################")
-                self.generatePath(backExpand, 1)
+                # self.generatePath(frontExpand)
+                return 1
+
+            if backExInFront[0]:
+                endtime = time.time()
+                print("finish time is " + str(endtime - starttime))
+                indexBackInFront = backExInFront[1]
+                realG_cost = self.frontArrayInfo[indexBackInFront].gcost + backExpand.gcost
+                print("find gcost is: " + str(realG_cost))
+                self.showlists()
+                # self.generatePath(backExpand)
                 return 1
 
             nodeFrontClose = frontExpand
