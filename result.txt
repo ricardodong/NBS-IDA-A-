@@ -1,0 +1,140 @@
+easy:
+12, 9, 19, 30, 31, 42, 47, 48, 55, 79
+
+normal:
+2, 4, 5, 6, 62 
+
+hard:
+21, 11
+
+A*:
+korf's 79:
+finish time is 201.10325121879578
+all nodes number: 130547
+open len: 63747
+updated node: 1767
+
+12:
+finish time is 48.36112999916077
+all nodes number: 62422
+open len: 30081
+updated node: 788
+45
+
+9:
+finish time is 60.06977391242981
+all nodes number: 66338
+open len: 32320
+
+2:
+zhengzai pao
+
+
+map:(read extra line 2, 10, 20, 22)
+finish time is 0.14913010597229004
+all nodes number: 207
+open len: 176
+updated node: 40
+
+finish time is 1.45831298828125
+all nodes number: 636
+open len: 389
+updated node: 553
+17.459972868926734
+
+finish time is 0.557999849319458
+all nodes number: 372
+open len: 261
+updated node: 137
+11.82842712474619
+
+finish time is 0.8872866630554199
+all nodes number: 501
+open len: 352
+updated node: 415
+20.145535412082957
+
+IDA:
+21:
+find gcost: 54
+generated node: 131079644
+finish time: 19269.150388240814
+
+12:
+find gcost: 45
+generated node: 68871
+finish time: 11.371992588043213
+
+9:
+find gcost: 46
+generated node: 1638551
+finish time: 282.7813193798065
+
+79:
+find gcost: 42
+generated node: 254400
+finish time: 43.910866022109985
+
+2:
+find gcost: 55
+generated node: 9777817
+finish time: 1537.0455267429352
+
+13:
+generated node: 3306370
+finish time: 526.1616280078888
+
+map:
+
+
+NBS:
+12: 
+68541
+25908.498
+23.47
+
+9:
+78341
+32468.498
+35
+
+79:
+274164
+116519.7
+108
+
+
+
+find!!, gcost:20.145535412082957
+finish in :2.019313097000122
+all nodes number: 745
+front Waiting len: 217
+front ready len: 22
+back Waiting len: 256
+back ready len: 12
+
+find!!, gcost:14.949382989376325
+finish in :3.7834866046905518
+all nodes number: 1247
+front Waiting len: 354
+front ready len: 38
+back Waiting len: 345
+back ready len: 40
+
+find!!, gcost:17.41348460451408
+finish in :1.1195573806762695
+all nodes number: 512
+front Waiting len: 204
+front ready len: 3
+back Waiting len: 138
+back ready len: 25
+
+find!!, gcost:18.0956473593183
+finish in :1.8421516418457031
+all nodes number: 709
+front Waiting len: 176
+front ready len: 50
+back Waiting len: 256
+back ready len: 9
+
+
