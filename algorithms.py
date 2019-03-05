@@ -404,9 +404,9 @@ class NBS:
         self.path = []
         self.updatednode = 0
 
-        self.hashfrontTa = {}
+        self.hashFrontTa = {}
         self.frontArrayInfo = []
-        self.hashbackTa = {}
+        self.hashBackTa = {}
         self.backArrayInfo = []
 
         self.frontWaitList = []
@@ -422,27 +422,35 @@ class NBS:
         print("back ready len: " + str(len(self.backReadyList)))
         print("updated node: "+ str(self.updatednode))
 
-    def generatePath(self, node):
-        newnode = node
-        while ut.isNotNum(newnode.prestate):
-            self.path.append(newnode)
-            nodeindex = self.hashTa[tuple(newnode.prestate)]
-            newnode = self.ArrayInfo[nodeindex]
+    def generatePath(self, node, frontOrBack):
+        newNode = node
+        newNode.print()
+        if frontOrBack == 0:
+            hashTa = self.hashFrontTa
+            array = self.frontArrayInfo
+        else:
+            hashTa = self.hashBackTa
+            array = self.backArrayInfo
+
+        while ut.isNotNum(newNode.prestate):
+            nodeIndex = hashTa[tuple(newNode.prestate)]
+            newNode = array[nodeIndex]
+            newNode.print()
 
     def search(self, start, goal):
 
-        #problem is that goal is fixed
+        # problem is that goal is fixed
         if start.heuristic == 0:
             print("finish time = 0")
             return 1
 
-        #get time
+        # get time
         starttime = time.time()
 
-        #init of all nodes and open list
-        self.hashfrontTa[tuple(start.state)] = 0
+        # init of all nodes and open list
+        self.hashFrontTa[tuple(start.state)] = 0
         self.frontArrayInfo.append(start)
-        self.hashbackTa[tuple(goal.state)] = 0
+        self.hashBackTa[tuple(goal.state)] = 0
         self.backArrayInfo.append(goal)
         nodeFrontClose = start
         nodeBackClose = goal
@@ -450,7 +458,7 @@ class NBS:
         indexArrayback = 1
         estimateCstar = max(start.heuristic, goal.heuristic)
         print(estimateCstar)
-        #first is start and added
+        # first is start and added
 
         while True:
             ##########################front##############################
@@ -459,7 +467,7 @@ class NBS:
             #print(len(ineigh))
             for j in frontNeigh:
                 # should update gcost here.
-                inOporClose = ut.inHashTable(self.hashfrontTa, tuple(j.state))
+                inOporClose = ut.inHashTable(self.hashFrontTa, tuple(j.state))
                 if inOporClose[0]:
                     # update path and gcost
                     origNodeindex = inOporClose[1]
@@ -469,7 +477,7 @@ class NBS:
                         self.frontArrayInfo[origNodeindex].update(j)
                         FrontOpenlistchange = True
                 else:
-                    self.hashfrontTa[tuple(j.state)] = indexArrayfront
+                    self.hashFrontTa[tuple(j.state)] = indexArrayfront
                     self.frontArrayInfo.append(j)
                     if j.gcost + j.heuristic < estimateCstar:
                         readylistNode = readypriqueNode(indexArrayfront, self.frontArrayInfo)
@@ -486,7 +494,7 @@ class NBS:
             # print(len(ineigh))
             for j in backNeigh:
                 # should update gcost here.
-                inOporClose = ut.inHashTable(self.hashbackTa, tuple(j.state))
+                inOporClose = ut.inHashTable(self.hashBackTa, tuple(j.state))
                 if inOporClose[0]:
                     # update path and gcost
                     origNodeindex = inOporClose[1]
@@ -496,7 +504,7 @@ class NBS:
                         self.backArrayInfo[origNodeindex].update(j)
                         backOpenlistchange = True
                 else:
-                    self.hashbackTa[tuple(j.state)] = indexArrayback
+                    self.hashBackTa[tuple(j.state)] = indexArrayback
                     self.backArrayInfo.append(j)
                     if j.gcost + j.heuristic < estimateCstar:
                         readylistNode = readypriqueNode(indexArrayback, self.backArrayInfo)
@@ -563,27 +571,35 @@ class NBS:
                 if min(smallestG, smallestFW, smallestBW) != 999999:
                     estimateCstar = min(smallestG, smallestFW, smallestBW)
                 print(smallestG)
-                self.showlists()
-                endtime = time.time()
-                print("finish in :" + str(endtime - starttime))
 
             ###########termination and add to close#####################
             frontExpand = self.frontArrayInfo[frontExpandIndex]
             backExpand = self.backArrayInfo[backExpandIndex]
-            if operator.eq(frontExpand.state, backExpand.state):
+            frontExInBack = ut.inHashTable(self.hashBackTa, tuple(frontExpand.state))
+            if frontExInBack[0] :
                 endtime = time.time()
-                print("find!!, gcost:" + str(frontExpand.gcost + backExpand.gcost))
-                print("finish in :" + str(endtime - starttime))
+                print("finish time is " + str(endtime - starttime))
+                # decide whether the found front node in back is in open or close, in order to decide the found gcost.
+                indexFrontInBack = frontExInBack[1]
+                inOpen = False
+                for j in self.backWaitList:
+                    if indexFrontInBack == j.index:
+                        inOpen = True
+                for j in self.backReadyList:
+                    if indexFrontInBack == j.index:
+                        inOpen = True
+                realG_cost = self.backArrayInfo[indexFrontInBack].gcost+frontExpand.gcost
+                if inOpen:
+                    print("find gcost is: "+str(realG_cost+1))
+                else:
+                    print("find gcost is: "+str(realG_cost))
+                # end of decide the gcost.
                 self.showlists()
+                self.generatePath(frontExpand, 0)
+                print("###################################")
+                self.generatePath(backExpand, 1)
                 return 1
-            frontExpandNeigh = frontExpand.getNeigh()
-            for k in frontExpandNeigh:
-                if operator.eq(k.state, backExpand.state):
-                    endtime = time.time()
-                    print("find!!, gcost:" + str(k.gcost+backExpand.gcost))
-                    print("finish in :" + str(endtime- starttime))
-                    self.showlists()
-                    return 1
+
             nodeFrontClose = frontExpand
             nodeBackClose = backExpand
             #nodeFrontClose.print()
@@ -613,8 +629,8 @@ if __name__ == '__main__':
     firstnode = nodes.spnode(a,'none', 0, 0)
     #'none' refers to generated method of current stp node, first 0 refers to gcost, next 0 refers to previous node
     goalstate = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    goalnode = nodes.spnode(goalstate,'none', 999999, 0)
-    #goalnodeforNBS = nodes.spnode(goalstate, 'none', 0, 0, a)
+    #goalnode = nodes.spnode(goalstate,'none', 999999, 0)
+    goalnodeforNBS = nodes.spnode(goalstate, 'none', 0, 0, a)
     #a refers to goal state
 
     mapfile = open("warframe\Simple.3dmap")
@@ -641,6 +657,6 @@ if __name__ == '__main__':
     vogoalnode = nodes.voxelnode(vogoalstate, startstate, 0, 0, vomap)
 
     newsearch = NBS()
-    find = newsearch.search(vofirstnode,vogoalnode)
+    find = newsearch.search(firstnode,goalnodeforNBS)
     #for i in newsearch.path:
     #    i.print()
